@@ -1,7 +1,7 @@
 import logging
 import os
 import csv
-from datetime import timezone
+from datetime import datetime, timezone
 import pytz
 from telegram import Update
 from telegram.ext import filters, MessageHandler, ApplicationBuilder, CommandHandler, ContextTypes
@@ -49,18 +49,23 @@ async def new_poo(update: Update, context: ContextTypes.DEFAULT_TYPE):
         # print(type(user_profile_photos.photos[0]))
         # print(user_profile_photos.total_count)
 
-        # with open(f'{REPORT_FOLDER}/iCrap_report.csv', 'r') as f:
-        #     f_csv = csv.reader(f)
+        flag_too_quick_pooper = False
+        with open(f'{REPORT_FOLDER}/iCrap_report.csv', 'r') as f:
+            f_csv = csv.reader(f)
+            for line in f_csv:
+                if str(user_id) in line[1]: # user_id is second field
+                    old_date = datetime.strptime(line[2], '%Y-%m-%d %H:%M:%S%z') # date is third field
+                    delta_minutes = (date - old_date).total_seconds()/60
 
-        #     for line in f_csv:
-        #         if str(user_id) in line[1]: # user_id is second field
-                    
-        #             # print(line.strip(",")[2])
+                    if delta_minutes < 10:
+                        flag_too_quick_pooper = True
+                        print(f"You poop already at {old_date}, {int(delta_minutes)} minutes ago. (Wait 10 minutes before returing on the WC!)")
 
-        fields=[user_nickname,user_id,date]
-        with open(f'{REPORT_FOLDER}/iCrap_report.csv', 'a') as f:
-            writer = csv.writer(f)
-            writer.writerow(fields)
+        if flag_too_quick_pooper == False:
+            fields=[user_nickname,user_id,date]
+            with open(f'{REPORT_FOLDER}/iCrap_report.csv', 'a') as f:
+                writer = csv.writer(f)
+                writer.writerow(fields)
 
     await add_entry(update.message.from_user, update.message.date.replace(tzinfo=timezone.utc).astimezone(tz=pytz.timezone("Europe/Rome")))
 
