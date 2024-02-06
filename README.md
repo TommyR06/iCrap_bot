@@ -7,3 +7,4 @@ Based on python-telegram-bot library.
 ## Requirement
 
 * ``pip install "python-telegram-bot"``
+* ``pip install "pytz"``
