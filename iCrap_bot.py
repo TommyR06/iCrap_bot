@@ -49,6 +49,11 @@ async def new_poo(update: Update, context: ContextTypes.DEFAULT_TYPE):
         # print(type(user_profile_photos.photos[0]))
         # print(user_profile_photos.total_count)
 
+        # check if file exist, otherwise create!
+        if not os.path.exists(f'{REPORT_FOLDER}/iCrap_report.csv'):
+            with open(f'{REPORT_FOLDER}/iCrap_report.csv', 'w') as f:
+                f.close()
+
         flag_too_quick_pooper = False
         with open(f'{REPORT_FOLDER}/iCrap_report.csv', 'r') as f:
             f_csv = csv.reader(f)
